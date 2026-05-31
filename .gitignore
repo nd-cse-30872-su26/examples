@@ -1,0 +1,10 @@
+*~
+*.o
+*.pyc
+*.swp
+*.exe
+*.so
+*.a
+.mypy_cache
+solution
+template
