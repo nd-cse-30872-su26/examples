@@ -1,1 +1,1 @@
-# CSE 30872 Programming Challenges (Summer 2025) - Examples
+# CSE 30872 Programming Challenges (Summer 2026) - Examples
