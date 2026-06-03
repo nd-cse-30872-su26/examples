@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
 
+''' Find maximum row in a matrix '''
+
 import sys
 
 # Type Aliases
