@@ -8,7 +8,7 @@ import sys
 
 Pair = tuple[int, int]
 
-# Functions
+# Constants
 
 NEIGHBORS = {
     1: (6, 8),
@@ -23,77 +23,46 @@ NEIGHBORS = {
     0: (4, 6),
 }
 
+# Functions
+
 def dial_numbers_count1(start: int, length: int) -> int:
-    ''' Version 1: Recursive '''
+    ''' Version 1: Recursive
+
+    >>> dial_numbers_count1(7, 3)
+    4
+    '''
     # Base case
-    if length == 1:
+    if length <= 1:
         return 1
 
     # Recursive step
-    return sum(
-        dial_numbers_count1(neighbor, length - 1) for neighbor in NEIGHBORS[start]
-    )
+    count = 0
+    for neighbor in NEIGHBORS[start]:
+        count += dial_numbers_count1(neighbor, length - 1)
+
+    return count
 
 def dial_numbers_count2(start: int, length: int, cache: dict[Pair, int]={}) -> int:
     ''' Version 2: Recursive with Memoization (Cache) '''
     # Base case
-    if length == 1:
+    if length <= 1:
         return 1
 
     # Recursive step (memoized)
-    pair = (start, length)
-    if pair not in cache:
-        cache[pair] = sum(
-            dial_numbers_count2(neighbor, length - 1, cache) for neighbor in NEIGHBORS[start]
+    args = (start, length)
+    if not args in cache:
+        cache[args] = sum(
+            dial_numbers_count2(n, length - 1) for n in NEIGHBORS[start]
         )
 
-    return cache[pair]
+    return cache[args]
 
-def dial_numbers_count3(start: int, length: int) -> int:
-    ''' Version 3: Table Building in O(n^2) space '''
-    # Initialize Table
-    table = [[0 for _ in range(length + 1)] for _ in range(len(NEIGHBORS))]
-
-    # Initialize Base Case: 1 Permutation to Length 1
-    for row in range(len(NEIGHBORS)):
-        table[row][1] = 1
-
-    # Compute Permutations(Number, Hops):
-    #
-    #   Permutations(Number, Hops) = Sum(
-    #       Permutations(Neighbor, Hops - 1) for Neighbor in Neighbors
-    #   )
-    for hops in range(2, length + 1):
-        for number in range(len(NEIGHBORS)):
-            table[number][hops] = sum(table[neighbor][hops - 1] for neighbor in NEIGHBORS[number])
-
-    return table[start][length]
-
-def dial_numbers_count4(start: int, length: int) -> int:
-    ''' Version 4: Table Building in O(n) space '''
-    # Initialize Table and Base Case
-    old_table = [1 for _ in range(len(NEIGHBORS))]
-    new_table = [1 for _ in range(len(NEIGHBORS))]
-
-    # Compute Permutations(Number, Hops):
-    #
-    #   Permutations(Number, Hops) = Sum(
-    #       Permutations(Neighbor, Hops - 1) for Neighbor in Neighbors
-    #   )
-    for hops in range(2, length + 1):
-        for number in range(len(NEIGHBORS)):
-            new_table[number] = sum(old_table[neighbor] for neighbor in NEIGHBORS[number])
-        old_table = new_table[:]
-
-    return new_table[start]
+# Main Execution
 
 def main():
     for line in sys.stdin:
         start, length = map(int, line.split())
-        count         = dial_numbers_count1(start, length)
-        print(count)
-
-# Main Execution
+        print(dial_numbers_count2(start, length))
 
 if __name__ == '__main__':
     main()
