@@ -15,6 +15,7 @@ vector<int> compute_table(size_t n, vector<int> &coins) {
     vector<int> table(n + 1, n);
 
     // Initialize base cases (ie. coins)
+    table[0] = 0;
     for (auto coin : coins) {
     	table[coin] = 1;
     }
