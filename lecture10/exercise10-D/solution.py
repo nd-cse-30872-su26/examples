@@ -26,11 +26,9 @@ def read_graph() -> Graph:
 # Compute MST
 
 def compute_mst(g: Graph) -> Visited:
-    frontier: Frontier = []
-    visited : Visited  = {}
     start   : str      = list(g.keys())[0]
-
-    heapq.heappush(frontier, (0, start, start))
+    frontier: Frontier = [(0, start, start)]
+    visited : Visited  = {}
 
     while frontier:
         weight, source, target = heapq.heappop(frontier)

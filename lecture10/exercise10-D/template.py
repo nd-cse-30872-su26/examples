@@ -26,9 +26,9 @@ def read_graph() -> Graph:
 # Compute MST
 
 def compute_mst(g: Graph) -> Visited:
+    start   : str      = list(g.keys())[0]
     frontier: Frontier = []
     visited : Visited  = {}
-    start   : str      = list(g.keys())[0]
 
     # TODO
 
