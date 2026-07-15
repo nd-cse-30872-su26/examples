@@ -22,32 +22,65 @@ def read_graph() -> Graph:
 
 # Find Circuit
 
-def find_circuit(graph: Graph, start: int, vertex: int, visited: set[int], path: list[Edge]) -> list[Edge]:
+def find_circuit(graph: Graph, edge: Edge, visited: set[int], path: list[Edge]) -> list[Edge]:
     ''' Recursive DFS traversal '''
+    source, target = edge
+
+    # If we have already seen this edge, return nothing
+    if graph[source][target] in visited:
+        return []
+
+    # Mark edge as visited
+    visited.add(graph[source][target])
+
+    # Add edge to path
+    path.append(edge)
+
     # If we have returned to start, return path
-    if path and start == vertex:
+    if path and target == path[0][0]:
         return path
 
     # Visit each unvisited outgoing edge
-    for neighbor in graph[vertex]:
-        if graph[vertex][neighbor] in visited:
-            continue
-
-        # Mark visited
-        visited.add(graph[vertex][neighbor])
-
-        # Add to path
-        path.append((vertex, neighbor))
-
+    for neighbor in graph[target]:
         # Recurse
-        if find_circuit(graph, start, neighbor, visited, path):
+        if find_circuit(graph, (target, neighbor), visited, path):
             return path
 
-        # Remove from path
-        path.pop(-1)
+    # Unmark visited
+    visited.remove(graph[source][target])
 
-        # Unmark visited
-        visited.remove(graph[vertex][neighbor])
+    # Remove from path
+    path.pop(-1)
+
+    # No circuit found, so return nothing
+    return []
+
+def find_circuit2(graph: Graph, edge: Edge, visited: set[int], path: list[Edge]) -> list[Edge]:
+    ''' Recursive DFS traversal '''
+    source, target = edge
+
+    # If we have already seen this edge, return nothing
+    if graph[source][target] in visited:
+        return []
+
+    # Mark edge as visited
+    visited.add(graph[source][target])
+
+    # Add edge to path
+    path += [edge]
+
+    # If we have returned to start, return path
+    if path and target == path[0][0]:
+        return path
+
+    # Visit each unvisited outgoing edge
+    for neighbor in graph[target]:
+        # Recurse
+        if result := find_circuit(graph, (target, neighbor), visited, path[:]):
+            return result
+
+    # Unmark edge as visited
+    visited.remove(graph[source][target])
 
     # No circuit found, so return nothing
     return []
@@ -59,21 +92,22 @@ def find_euler_circuit(graph: Graph) -> list[Edge]:
     no circuit is possible '''
     visited: set[int]   = set()                 # Visited edges (set of edge ordinals)
     circuit: list[Edge] = []                    # Eulerian circuit (list of edges)
-    start  : int        = list(graph.keys())[0] # Starting vertex
+    origin : int        = list(graph.keys())[0] # Starting vertex
+    start  : Edge       = (origin, list(graph[origin].items())[0][0]) # Starting edge
     index  : int        = 0                     # Where in circuit to insert subcircuit
 
     while start:
         # Find subcircuit and insert it after current component
-        path    = find_circuit(graph, start, start, visited, [])
+        path    = find_circuit(graph, start, visited, [])
         circuit = circuit[0:index] + path + circuit[index:]
 
         # Check if any nodes in current circuit have an unused edge, if so, set
         # start so we search for subcircuit beginning at that vertex
-        start = 0
+        start = None
         for index, vertex in enumerate(source for source, target in circuit):
             for neighbor, edge in graph[vertex].items():
                 if edge not in visited:
-                    start = vertex
+                    start = (vertex, neighbor)
                     break
 
     return circuit
